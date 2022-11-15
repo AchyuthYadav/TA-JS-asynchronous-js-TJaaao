@@ -1,17 +1,10 @@
 let url = "https://api.spaceflightnewsapi.net/v3/articles?_limit=30"
 let newsElm = document.querySelector(".news");
-let select = document.querySelector("select");
+let select = document.querySelector('select');
 let allNews = [] ;
 
 
-function displayOptions(sources){
-    sources.forEach((source) => {
-        let option = document.createElement("option");
-        option.innerText = source;
-        option.value = source;
-        select.append(option);
-    })
-}
+
 
 select.addEventListener('change', (event) => {
     let source = event.target.value.trim();
@@ -20,23 +13,33 @@ select.addEventListener('change', (event) => {
     }else {
         filterdnews = allNews;
     }
-    renderNews(filterNews);
+    renderNews(filterdNews);
 })
 
 
-fetch(url).then(res=>res.json())
+fetch(url).then((res)=>res.json())
           .then((news)=>{ 
             console.log(news); 
             allNews = news;
             renderNews(news);
 
 
-           let allSource = Array.from(new Set(news.map((n) => n.newsSite)))
-           console.log(allSource);
+           let allSources = Array.from(new Set(news.map((n) => n.newsSite)))
+            displayOptions(allSources);
         })
 
+
+        function displayOptions(sources){
+            sources.forEach((source) => {
+                let option = document.createElement("option");
+                option.innerText = source;
+                option.value = source;
+                select.append(option);
+            })
+        }        
+
 function renderNews(news){
-    newsElm.innerText=" ";
+    newsElm.innerText='';
     news.forEach((newsIteam) => {
         let li =  document.createElement('li');
         let img = document.createElement('img');
