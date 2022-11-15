@@ -3,7 +3,26 @@ let newsElm = document.querySelector(".news");
 let select = document.querySelector('select');
 let allNews = [] ;
 
+let main = document.querySelector('.main');
+let errorElm = document.querySelector('.error_message');
+let isLoading = false;
 
+function handleSpinner(){
+    if (isLoading){
+        newsElm.innerHTML = '<div class="donut"></div>';
+    }
+}
+
+function handleErrorMessage(message = 'something went wrong '){
+    main.style.display = 'none';
+    errorElm.innerText = message;
+}
+
+if (navigator.onLine){
+init();
+}else {
+handleErrorMessage('no internet');
+}
 
 
 select.addEventListener('change', (event) => {
@@ -17,8 +36,21 @@ select.addEventListener('change', (event) => {
 })
 
 
+function init(){
+    isLoading = true;
+    handleSpinner();
+    
 fetch(url).then((res)=>res.json())
-          .then((news)=>{ 
+          .then((news)=>{
+            if(res.ok){
+                return res.json();
+            } else {
+                throw  new error('not  ok')
+            }
+
+            isLoading = false;
+            handleSpinner();
+
             console.log(news); 
             allNews = news;
             renderNews(news);
@@ -26,6 +58,8 @@ fetch(url).then((res)=>res.json())
 
            let allSources = Array.from(new Set(news.map((n) => n.newsSite)))
             displayOptions(allSources);
+        }).catch((error) => {
+            handleErrorMessage(error)
         })
 
 
@@ -37,6 +71,8 @@ fetch(url).then((res)=>res.json())
                 select.append(option);
             })
         }        
+    
+}
 
 function renderNews(news){
     newsElm.innerText='';
@@ -61,3 +97,4 @@ function renderNews(news){
         newsElm.append(li);
     });
 }
+
